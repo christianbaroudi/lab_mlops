@@ -26,5 +26,8 @@ def preprocess(input_path, output_path):
 
     
     df.drop(columns=['Name','Parch','SibSp','Ticket'],inplace=True)
-    df.to_csv(output_path, index=False)
     
+    Path(output_path).parent.mkdir(parents=True, exist_ok=True)
+    df.to_csv(output_path, index=False)
+    print(f"[featurize] {len(df)} rows -> {output_path}")
+
