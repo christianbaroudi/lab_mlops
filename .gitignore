@@ -1,1 +1,3 @@
-resources/titanic-survival.ipynb
+resources/*
+__pycache__/
+*.py[cod]
