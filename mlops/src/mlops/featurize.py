@@ -9,7 +9,7 @@ def family_size(number):
     else:
         return "Large"
 
-def preprocess(input_path, output_path):
+def featurize(input_path, output_path):
     
     df = pd.read_csv(input_path)
     
