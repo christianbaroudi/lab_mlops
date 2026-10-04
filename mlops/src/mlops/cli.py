@@ -24,17 +24,14 @@ def build_parser() -> argparse.ArgumentParser:
 
     p = steps.add_parser("train", help="train a model and save it to resource/models/<model>.pkl")
     p.add_argument("--input", default="resources/featurized.csv")
-    p.add_argument("--model", choices=MODELS, default="logistic_regression")
 
     p = steps.add_parser("evaluate", help="accuracy of a saved model on the held-out train rows")
     p.add_argument("--input", default="resources/featurized.csv")
-    p.add_argument("--model", choices=MODELS, default="logistic_regression")
-    p.add_argument("--output", default="resources/eval/metrics.json")
+    p.add_argument("--output", default="resources/eval/")
 
     p = steps.add_parser("predict", help="predict the test rows with a saved model")
     p.add_argument("--input", default="resources/featurized.csv")
-    p.add_argument("--model", choices=MODELS, default="logistic_regression")
-    p.add_argument("--output", default="resources/predictions.csv")
+    p.add_argument("--output", default="resources/predictions/")
 
     return parser
 
@@ -47,11 +44,11 @@ def main():
     elif args.step == "featurize":
         featurize(args.input, args.output)
     elif args.step == "train":
-        train(args.model, args.input)
+        train(args.input)
     elif args.step == "evaluate":
-        evaluate(args.model, args.input, args.output)
+        evaluate(args.input, args.output)
     elif args.step == "predict":
-        predict(args.model, args.input, args.output)
+        predict(args.input, args.output)
 
 
 if __name__ == "__main__":

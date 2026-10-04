@@ -23,6 +23,10 @@ from sklearn.preprocessing import (
 import pandas as pd
 from pathlib import Path
 import pickle
+import warnings
+
+warnings.filterwarnings("ignore")
+
 
 MODELS = {
     
@@ -37,8 +41,7 @@ MODELS = {
     "gaussian_process": gaussian_process.GaussianProcessClassifier(random_state=42),
     
     # GLM. 
-    "logistic_regression": linear_model.LogisticRegressionCV(max_iter=1000, l1_ratios=(0,), scoring="accuracy", use_legacy_attributes=False),
-    "passive_aggressive": linear_model.PassiveAggressiveClassifier(random_state=42),
+    "logistic_regression": linear_model.LogisticRegressionCV(max_iter=5000, l1_ratios=(0,), scoring="accuracy", use_legacy_attributes=False),
     "ridge": linear_model.RidgeClassifierCV(),
     "sgd": linear_model.SGDClassifier(random_state=42),
     "perceptron": linear_model.Perceptron(random_state=42),
@@ -61,7 +64,7 @@ MODELS = {
 }
 
 def model_path(model_name):
-    return Path("resources/models") / f"{model_name}.pkl"
+    return Path("../resources/models") / f"{model_name}.pkl"
 
 def create_pipeline(algo):
     num_cat_transformation = ColumnTransformer([
@@ -72,7 +75,7 @@ def create_pipeline(algo):
     ], remainder="passthrough")
 
     bins = ColumnTransformer([
-        ("Kbins", KBinsDiscretizer(n_bins=15, encode="ordinal", strategy="quantile"), [0, 1]),
+        ("Kbins", KBinsDiscretizer(n_bins=10, encode="ordinal", strategy="quantile"), [0, 1]),
     ], remainder="passthrough")
 
     return Pipeline([
@@ -82,9 +85,10 @@ def create_pipeline(algo):
     ])
 
 
-def train(model_name, input_path):
+def train_model(model_name, input_path):
     df = pd.read_csv(input_path)
-    X_train, X_test, y_train, y_test = train_test_split(df.drop(columns=["Survived"]), df["Survived"], test_size=0.2, random_state=42)
+    train = df.loc[:890]
+    X_train, X_test, y_train, y_test = train_test_split(train.drop(columns=["Survived"]), train["Survived"], test_size=0.2, random_state=42)
     pipeline = create_pipeline(MODELS[model_name])
     
     cv = StratifiedKFold(n_splits=5, shuffle=True, random_state=42)
@@ -98,3 +102,8 @@ def train(model_name, input_path):
     with open(path, "wb") as f:
         pickle.dump(pipeline, f)
     print(f"[train] model -> {path}")
+    
+    
+def train(input_path):
+    for model_name in MODELS.keys():
+        train_model(model_name, input_path)
